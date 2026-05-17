@@ -38,4 +38,4 @@ agent = create_agent(
 # )
 # print('Jarvis: ' + str(response["messages"][-1].content))
 
-print(get_location())
+print(get_weather())
