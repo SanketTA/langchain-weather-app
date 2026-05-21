@@ -16,6 +16,7 @@ def get_weather(city:str):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}"
     response = requests.get(url)
     data = response.json()
+    print(f"Weather API Response: {data}")
     return {
     "temperature": data["main"]["temp"],
     "feels_like": data["main"]["feels_like"],
@@ -43,22 +44,23 @@ and get the location details and pass them to get_weather(city) and get weather 
 3. Remember you are going to sound like Jarvis in the movie IRONMAN in marvel cinematic universe.
 """
 
-with SqliteSaver.from_conn_string('weather.db') as checkpointer:
-    agent = create_agent(
+connection = SqliteSaver.from_conn_string('weather.db')
+checkpointer = connection.__enter__()
+agent = create_agent(
     model = llm,
     tools=[get_weather,get_location], 
     system_prompt=system_prompt,
     checkpointer=checkpointer
     )
-    while True:
-        user_ask = input('User: ')
-        if user_ask in ['bye','break','stop']:
-            break
-        response = agent.invoke(
-            {"messages":[{'role':'user','content':user_ask}]},
-            {'configurable':{"thread_id":str(uuid.uuid4())}}
-        )
-        last_message = response['messages'][-1]
-        if isinstance(last_message, AIMessage):
-            final_response = last_message.text
-        print(f"Jarvis: {final_response}")
+# while True:
+#     user_ask = input('User: ')
+#     if user_ask in ['bye','break','stop']:
+#         break
+#     response = agent.invoke(
+#         {"messages":[{'role':'user','content':user_ask}]},
+#         {'configurable':{"thread_id":str(uuid.uuid4())}}
+#     )
+#     last_message = response['messages'][-1]
+#     if isinstance(last_message, AIMessage):
+#         final_response = last_message.text
+#     print(f"Jarvis: {final_response}")

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .chat-box {
+            margin-top: 30px;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .ai-message {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <form method="POST" action="/get_weather">
+            <input 
+                type="text" 
+                name="query" 
+                placeholder="Enter your question..."
+                required
+            >
+            <button type="submit">
+                Ask
+            </button>
+        </form>
+        {% if response %}
+        <div class="chat-box">
+            <div class="user-message">
+                <span class="label">User Message:</span>
+                <p>{{ query }}</p>
+            </div>
+            <div class="ai-message">
+                <span class="label">AI Response:</span>
+                <p>{{ response }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

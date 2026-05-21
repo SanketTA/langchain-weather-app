@@ -39,6 +39,9 @@ htmlcov/
 
 # SQLite Database
 *.sqlite3
+*.db
+*.db-shm
+*.db-wal
 
 # LangChain / Temp Files
 *.tmp
