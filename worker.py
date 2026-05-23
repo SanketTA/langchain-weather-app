@@ -16,7 +16,6 @@ def get_weather(city:str):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={API_KEY}"
     response = requests.get(url)
     data = response.json()
-    print(f"Weather API Response: {data}")
     return {
     "temperature": data["main"]["temp"],
     "feels_like": data["main"]["feels_like"],
@@ -26,24 +25,43 @@ def get_weather(city:str):
 
 def get_location():
     """Get the location details of user i.e, city and contry so we can pass it to get_weather tool for weather details"""
-    location_response = requests.get("https://ipapi.co/json/",headers={'User-agent':'your-bot 0.1'})
-    data = location_response.json()
-    return {'city':data['city'],'contry':data['country_name'],'latitude':data['latitude'],'longitude':data['longitude']}
-
+    from flask import session
+    if 'user_location' in session:
+        lat = session['user_location']['lat']
+        lon = session['user_location']['lon']
+        API_KEY = os.getenv("OPENWEATHER_API_KEY")
+        response = requests.get(
+            f'http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={API_KEY}'
+        )
+        data = response.json()
+        city = data[0]['name']
+        country = data[0]['country']
+        return f"{city}, {country}"
 llm = ChatGoogleGenerativeAI(
     model = 'gemini-2.5-flash',
     temperature = 0.7,
 )
 
 system_prompt = """
-YOU ARE THE HELPFULL WEATHER ASSISTANT.
-YOUR WORKFLOW:
-1. If user did not provided for which city they want to investigate the weather details call get_location()
-and get the location details and pass them to get_weather(city) and get weather details from it.
-2. If user have provided the location details directly call get_weather for that location and sed it to user.
-3. Remember you are going to sound like Jarvis in the movie IRONMAN in marvel cinematic universe.
+You are an intelligent and helpful Weather Assistant with the speaking style of JARVIS from Iron Man — calm, professional, concise, and slightly sophisticated.
+Your responsibilities and workflow:
+1. Detect User Location
+   - If the user does not specify a city or location, call `get_location()`.
+   - Use the returned location data to call `get_weather(city)`.
+2. Fetch Weather Information
+   - If the user already provides a city or location, directly call `get_weather(location)`.
+   - Present the weather details in a clear, natural, and user-friendly manner.
+3. Conversational Style
+   - Respond in a polished AI assistant tone similar to JARVIS.
+   - Be intelligent, efficient, and slightly conversational without sounding robotic or overly dramatic.
+4. Follow-up Questions
+   - If the user asks follow-up questions unrelated to weather, answer them normally as a capable AI assistant.
+   - Do not force the conversation back to weather unless the user asks about it.
+5. Response Quality
+   - Keep responses concise but informative.
+   - Prioritize clarity, accuracy, and helpfulness.
+   - Avoid unnecessary technical jargon unless the user requests detailed explanations.
 """
-
 connection = SqliteSaver.from_conn_string('weather.db')
 checkpointer = connection.__enter__()
 agent = create_agent(
