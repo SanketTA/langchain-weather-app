@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <script>
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                document.querySelector('input[name="latitude"]').value = position.coords.latitude;
+                document.querySelector('input[name="longitude"]').value = position.coords.longitude;
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -72,28 +82,31 @@
     <div class="container">
         <h1>Weather App</h1>
         <form method="POST" action="/get_weather">
-            <input 
-                type="text" 
-                name="query" 
-                placeholder="Enter your question..."
-                required
-            >
+            <input type="text" name="query" placeholder="Enter your question..."required>
+            <input type="hidden" name="latitude" required>
+            <input type="hidden" name="longitude" required>
             <button type="submit">
                 Ask
             </button>
         </form>
-        {% if response %}
+        {% if messages %}
         <div class="chat-box">
+            {% for msg in messages | reverse %}
+            {% if msg.type == 'human' %}
             <div class="user-message">
                 <span class="label">User Message:</span>
-                <p>{{ query }}</p>
+                <p>{{ msg.content }}</p>
             </div>
+            {% elif msg.type == 'ai' %}
             <div class="ai-message">
                 <span class="label">AI Response:</span>
-                <p>{{ response }}</p>
+                <p>{{ msg.content }}</p>
             </div>
+            {% endif %}
+            {% endfor %}
         </div>
         {% endif %}
+        
     </div>
 </body>
 </html>
